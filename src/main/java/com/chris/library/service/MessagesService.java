@@ -1,9 +1,12 @@
 package com.chris.library.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.chris.library.RequestModels.AdminQuestionRequest;
 import com.chris.library.dao.MessageRepository;
 import com.chris.library.entities.Messages;
 
@@ -36,5 +39,38 @@ public class MessagesService {
 		messageRepository.save(message);
 			
 	}
+	
+	
+	
+	public void PutMessage(AdminQuestionRequest adminQuestionRequest, 
+			String userEmail) throws Exception {
+		if (adminQuestionRequest == null || adminQuestionRequest.getId() == null) {
+			throw new Exception("Message id is required");
+		}
+
+		if (adminQuestionRequest.getResponse() == null || adminQuestionRequest.getResponse().trim().isEmpty()) {
+			throw new Exception("Response is required");
+		}
+		
+		Optional<Messages> message = messageRepository.findById(adminQuestionRequest.getId());
+
+		if (message.isEmpty()) {
+		    throw new Exception("Message not found");
+		}
+
+		Messages existingMessage = message.get();
+		existingMessage.setResponse(adminQuestionRequest.getResponse().trim());
+		existingMessage.setAdminEmail(userEmail);
+		existingMessage.setClosed(true);
+
+		messageRepository.save(existingMessage);
+		
+	}
+	
+	
+	
+	
+	
+	
 	
 }
